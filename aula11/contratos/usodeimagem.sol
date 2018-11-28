@@ -1,34 +1,59 @@
 pragma solidity 0.4.25;
 
-contract UsoDeImagem {
+contract Aposta {
 	
-    string public nomeEmpresa;
-    address agente;
-    address artista;
-	
-    modifier somenteArtista() {
-        require(msg.sender==artista, "Somente artista pode realizar essa operação");
+    string public nome;
+    address public vencedor;
+    address public apostador1;
+    address public apostador2;
+    address public mediador;
+    
+    modifier somenteMediador() {
+        require(msg.sender==mediador, "Somente mediador pode realizar essa operação");
         _;
     }
-
-    constructor() public {
-        nomeEmpresa = "Artista SuperPop Ltda";
-        artista = msg.sender;
-    }
 	
-    function definirNomeDaEmpresa(string qualNomeDaEmpresa) public somenteArtista  {
-        nomeEmpresa = qualNomeDaEmpresa;
+    modifier somenteApostador1() {
+        require(msg.sender==apostador1, "Somente apostador_1 pode realizar essa operação");
+        _;
     }
-
-    function definirAgente(address qualAgente) public somenteArtista  {
-        require(qualAgente != address(0), "Endereço de agente invalido");
-        agente = qualAgente;
+    
+    modifier somenteApostador2() {
+        require(msg.sender==apostador2, "Somente apostador_2 pode realizar essa operação");
+        _;
     }
-	
-    function receberPeloUso() public payable {
-        require(msg.value >= 100 szabo, "Por favor pague o valor mínimo");
-        if (agente != address(0)) {
-            agente.transfer((msg.value * 10) / 100);
+    
+     constructor() public {
+        mediador = msg.sender;
+    }
+    
+    function definirNomeDaAposta(string _nome) public somenteMediador {
+        nome = _nome;
+    }
+    
+    function definirApostador1(address _apostador1) public somenteMediador {
+    	apostador1 = _apostador1;
+    }
+    
+    function definirApostador2(address _apostador2) public somenteMediador {
+    	apostador2 = _apostador2;
+    }
+    
+    function depositar() public payable {
+        
+    }
+    
+    function definirVencedor(address _vencedor) public somenteMediador {
+        vencedor = _vencedor;
+    }
+    
+    function pagar() public {
+        if (vencedor == apostador1) {
+            apostador1.transfer((address(this).balance * 90) / 100);
+            mediador.transfer((address(this).balance * 10) / 100);
+        } else if (vencedor == apostador2) {
+            apostador2.transfer((address(this).balance * 90) / 100);
+            mediador.transfer((address(this).balance * 10) / 100);
         }
     }
 }
